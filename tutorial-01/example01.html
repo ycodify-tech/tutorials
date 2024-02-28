@@ -194,7 +194,7 @@ const YCAPI = {
             'data': [data]
         }));
     },
-    read: function (query, callback) {
+    read: function (filter, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/q/s/no-ac', true);
         xhr.setRequestHeader("Content-Type", 'application/json');
@@ -208,13 +208,13 @@ const YCAPI = {
                 });
             }
         };
-        // A consulta propriamente, posta na variável query, 
+        // A consulta propriamente, posta na variável filter, 
         // precisa ser posta como um elemento de um vetor e 
         // só então deve ser enviada à API de serviços da 
-        // Ycodify
-        xhr.send(JSON.stringify([query]));
+        // Ycodify, como uma query.
+        xhr.send(JSON.stringify([filter]));
     },
-    update: function (command, callback) {
+    update: function (data, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/c/s/no-ac', true);
         xhr.setRequestHeader("Content-Type", 'application/json');
@@ -234,10 +234,10 @@ const YCAPI = {
         // da Ycodify
         xhr.send(JSON.stringify({
             'action': 'UPDATE',
-            'data': [command]
+            'data': [data]
         }));
     },
-    delete: function (command, callback) {
+    delete: function (data, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/c/s/no-ac', true);
         xhr.setRequestHeader("Content-Type", 'application/json');
@@ -257,7 +257,7 @@ const YCAPI = {
         // da Ycodify
         xhr.send(JSON.stringify({
             'action': 'DELETE',
-            'data': [command]
+            'data': [data]
         }));
     }
 }
