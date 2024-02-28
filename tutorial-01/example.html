@@ -58,13 +58,13 @@
 </pre>
 <script>
 function getCommand() {
-    // o trecho de código a seguir, informa a estrutura básica 
+    // o trecho de código a seguir informa a estrutura básica 
     // de um comando a fim de persistir ou remover dados do banco
     let command = {
         artist: {}
     };
-    // a seguir, o trecho de código, serve apenas para evitar
-    // uma tripa imensa de "ifs e elses", a fim de checar os
+    // o trecho de código a seguir serve apenas para evitar
+    // uma listagem grande de "ifs e elses", a fim de checar os
     // valores para cada um dos inputs
     var form = document.getElementById("artist");
     for (var i = 0; i < form.elements.length; i++) {
@@ -78,14 +78,14 @@ function getCommand() {
 }
 
 function getQuery() {
-    // o trecho de código a seguir, informa a estrutura básica 
+    // o trecho de código a seguir informa a estrutura básica 
     // da consulta a ser enviada
     let query = {
         artist: {}
     };
-    // a seguir, o trecho de código, serve apenas para evitar
-    // uma tripa imensa de "ifs e elses", a fim de checar os
-    // valores de cada um dos inputs
+    // o trecho de código a seguir serve apenas para evitar
+    // uma listagem grande de "ifs e elses", a fim de checar os
+    // valores para cada um dos inputs
     var form = document.getElementById("artist");
     for (var i = 0; i < form.elements.length; i++) {
         console.log(form.elements[i].value)
