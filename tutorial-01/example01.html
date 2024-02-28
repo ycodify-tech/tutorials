@@ -98,9 +98,11 @@ function getQuery() {
 }
 
 document.getElementById("create").addEventListener("click", function () {
-    let command = getCommand();
-    YCAPI.create(command, function(response) {
+    YCAPI.create(getCommand(), function(response) {
         if (response.status == 201) {
+            // IMPORTANTE: o status 201 é o código para operação
+            // de criação de novo registro no banco de dados
+            // realizada com sucesso
             alert('artista cadastrado com sucesso!')
             console.log(JSON.parse(response.content));
         } else {
@@ -110,13 +112,14 @@ document.getElementById("create").addEventListener("click", function () {
 });
 
 document.getElementById("read").addEventListener("click", function () {
-    let query = getQuery();
-    console.log(query);
     YCAPI.read(getQuery(), function(response) {
         if (response.status == 200) {
             let listing = JSON.stringify(JSON.parse(response.content), undefined, 4);
             document.getElementById('listing').innerText = listing;
         } else if (response.status == 204) {
+            // o status 204 informa que a pesquisa feita no backend
+            // não encontrou qualquer dados associado ao filtro
+            // informado na query
             alert('dado não encontrado!')
         }  else {
             throw Error('error: ' + JSON.parse(response));
