@@ -117,9 +117,9 @@ document.getElementById("read").addEventListener("click", function () {
             let listing = JSON.stringify(JSON.parse(response.content), undefined, 4);
             document.getElementById('listing').innerText = listing;
         } else if (response.status == 204) {
-            // o status 204 informa que a pesquisa feita no backend
-            // não encontrou qualquer dados associado ao filtro
-            // informado na query
+            // IMPORTANTE: o status 204 informa que a pesquisa feita 
+            // no backend não encontrou qualquer dados associado ao 
+            // filtro informado na query
             alert('dado não encontrado!')
         }  else {
             throw Error('error: ' + JSON.parse(response));
@@ -130,6 +130,9 @@ document.getElementById("read").addEventListener("click", function () {
 document.getElementById("update").addEventListener("click", function () {
     YCAPI.update(getCommand(), function(response) {
         if (response.status == 200) {
+            // IMPORTANTE: o status 200 é o código para operação
+            // de atualização de registro no banco de dados
+            // realizada com sucesso
             alert('cadastrado de artista atualizado com sucesso!')
         } else {
             throw Error('error: ' + JSON.parse(response));
@@ -140,6 +143,9 @@ document.getElementById("update").addEventListener("click", function () {
 document.getElementById("delete").addEventListener("click", function () {
     YCAPI.delete(getCommand(), function(response) {
         if (response.status == 200) {
+            // IMPORTANTE: o status 201 é o código para operação
+            // de remoção de registro no banco de dados
+            // realizada com sucesso
             alert('cadastro de artista apagado com sucesso!')
         } else {
             throw Error('error: ' + JSON.parse(response));
