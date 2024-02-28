@@ -1,0 +1,256 @@
+<html>
+<head>
+</head>
+<body>
+<br>
+<h2>Tutorial 01 <small style="font-size: 14px;">Usando Javascript puro</small></h2>
+<p>
+    Exemplo de trecho de código para aproveitamento da API de serviços da plataforma Ycodify, usando javascript puro com XMLHttpRequest como lib para requisições HTTP para a API.
+</p>
+<p>
+    Funcionalmente, o código a seguir implica um CRUD associado a uma entidade artista, cuja modelagem é tal como mostrado abaixo (conforme emprego da linguagem YCL):
+    <pre>
+        entity artist {
+            name
+            username
+            email
+            street
+            number
+            complement
+            city
+            state
+            country
+            zipcode
+        }
+    </pre>
+</p>
+<hr>
+<br>
+<br>
+<h3>Formulário para Cadastrp de Dados Relativos à Entidade Artist</h3>
+<br>
+<form id="artist">
+    <input id="id" placeholder="id">
+    <input id="name" placeholder="nome">
+    <input id="username" placeholder="username da aplicação">
+    <input id="email" placeholder="e-mail">
+    <input id="street" placeholder="rua">
+    <input id="number" placeholder="número">
+    <input id="complement" placeholder="complemento">
+    <input id="city" placeholder="cidade">
+    <input id="state" placeholder="estate">
+    <input id="country" placeholder="país">
+    <input id="zipcode" placeholder="CEP">
+</form>
+<br>
+<br>
+<button id="create">criar</button>
+<button id="read">ler</button>
+<button id="update">atulizar</button>
+<button id="delete">apagar</button>
+<hr>
+<br>
+<br>
+<h3>Listagem de Dados Relacionados à entidade Artist</h3>
+<br>
+<pre id="listing">
+
+</pre>
+<script>
+function getCommand() {
+    // o trecho de código a seguir, informa a estrutura básica 
+    // de um comando a fim de persistir ou remover dados do banco
+    let command = {
+        artist: {}
+    };
+    // a seguir, o trecho de código, serve apenas para evitar
+    // uma tripa imensa de "ifs e elses", a fim de checar os
+    // valores para cada um dos inputs
+    var form = document.getElementById("artist");
+    for (var i = 0; i < form.elements.length; i++) {
+        console.log(form.elements[i].value)
+        if (form.elements[i].value
+            && form.elements[i].value.trim() != '') {
+            command.artist[form.elements[i].id] = form.elements[i].value.trim();
+        }
+    }
+    return command;
+}
+
+function getQuery() {
+    // o trecho de código a seguir, informa a estrutura básica 
+    // da consulta a ser enviada
+    let query = {
+        artist: {}
+    };
+    // a seguir, o trecho de código, serve apenas para evitar
+    // uma tripa imensa de "ifs e elses", a fim de checar os
+    // valores de cada um dos inputs
+    var form = document.getElementById("artist");
+    for (var i = 0; i < form.elements.length; i++) {
+        console.log(form.elements[i].value)
+        if (form.elements[i].value
+            && form.elements[i].value.trim() != '') {
+            query.artist[form.elements[i].id] = form.elements[i].value.trim();
+        } else query.artist[form.elements[i].id] = '';
+    }
+    return query;
+}
+
+document.getElementById("create").addEventListener("click", function () {
+    let command = getCommand();
+    YCAPI.create(command, function(response) {
+        if (response.status == 201) {
+            alert('artista cadastrado com sucesso!')
+            console.log(JSON.parse(response.content));
+        } else {
+            throw Error('error: ' + JSON.parse(response));
+        }
+    });
+});
+
+document.getElementById("read").addEventListener("click", function () {
+    let query = getQuery();
+    console.log(query);
+    YCAPI.read(getQuery(), function(response) {
+        if (response.status == 200) {
+            let listing = JSON.stringify(JSON.parse(response.content), undefined, 4);
+            document.getElementById('listing').innerText = listing;
+        } else if (response.status == 204) {
+            alert('dado não encontrado!')
+        }  else {
+            throw Error('error: ' + JSON.parse(response));
+        }
+    });
+});
+
+document.getElementById("update").addEventListener("click", function () {
+    YCAPI.update(getCommand(), function(response) {
+        if (response.status == 200) {
+            alert('cadastrado de artista atualizado com sucesso!')
+        } else {
+            throw Error('error: ' + JSON.parse(response));
+        }
+    });
+});
+
+document.getElementById("delete").addEventListener("click", function () {
+    YCAPI.delete(getCommand(), function(response) {
+        if (response.status == 200) {
+            alert('cadastro de artista apagado com sucesso!')
+        } else {
+            throw Error('error: ' + JSON.parse(response));
+        }
+    });
+});
+
+const YCAPI = {
+    param: {
+        tenant: {
+            id: '19379587-75b0-3aec-9717-46c6e26757e3',
+            apiMasterKey: 'ed950147-a6fc-3d45-a69c-bfc55f414ae6',
+        },
+        baseAddress:'https://api.ycodify.com'
+    },
+    create: function (command, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/c/s/no-ac', true);
+        xhr.setRequestHeader("Content-Type", 'application/json');
+        xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+        xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                callback({
+                    status: xhr.status,
+                    content: xhr.response
+                });
+            }
+        };
+        xhr.send(JSON.stringify({
+            'action': 'CREATE',
+            'data': [command]
+        }));
+    },
+    read: function (query, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/q/s/no-ac', true);
+        xhr.setRequestHeader("Content-Type", 'application/json');
+        xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+        xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                callback({
+                    status: xhr.status,
+                    content: xhr.response
+                });
+            }
+        };
+        xhr.send(JSON.stringify([query]));
+    },
+    update: function (command, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/c/s/no-ac', true);
+        xhr.setRequestHeader("Content-Type", 'application/json');
+        xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+        xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                callback({
+                    status: xhr.status,
+                    content: xhr.response
+                });
+            }
+        };
+        xhr.send(JSON.stringify({
+            'action': 'UPDATE',
+            'data': [command]
+        }));
+    },
+    delete: function (command, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/c/s/no-ac', true);
+        xhr.setRequestHeader("Content-Type", 'application/json');
+        xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+        xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                callback({
+                    status: xhr.status,
+                    content: xhr.response
+                });
+            }
+        };
+        xhr.send(JSON.stringify({
+            'action': 'DELETE',
+            'data': [command]
+        }));
+    }
+}
+
+function createArtist() {
+    YCAPI.create({
+        "artist": {
+            "nome": "bobi pai",
+            "username": "bobipai",
+            "street": "street",
+            "number": "number",
+            "complement": "complement",
+            "country": "country",
+            "state": "state",
+            "city": "city",
+            "zipcode": "zipcode",
+            "email": "email"
+        }
+    }, function(response) {
+        if (response.status == 201 || response.status == 200) {
+            alert('artista cadastrado com sucesso!')
+
+            console.log(JSON.parse(response.content));
+        } else {
+            throw Error('error: ' + JSON.parse(response));
+        }
+    });
+}
+</script>
+</body>
+</html>
