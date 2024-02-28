@@ -226,31 +226,6 @@ const YCAPI = {
         }));
     }
 }
-
-function createArtist() {
-    YCAPI.create({
-        "artist": {
-            "nome": "bobi pai",
-            "username": "bobipai",
-            "street": "street",
-            "number": "number",
-            "complement": "complement",
-            "country": "country",
-            "state": "state",
-            "city": "city",
-            "zipcode": "zipcode",
-            "email": "email"
-        }
-    }, function(response) {
-        if (response.status == 201 || response.status == 200) {
-            alert('artista cadastrado com sucesso!')
-
-            console.log(JSON.parse(response.content));
-        } else {
-            throw Error('error: ' + JSON.parse(response));
-        }
-    });
-}
 </script>
 </body>
 </html>
