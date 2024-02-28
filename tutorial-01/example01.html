@@ -58,13 +58,15 @@
 </pre>
 <script>
 function getCommand() {
-    // o trecho de código a seguir informa a estrutura básica 
-    // de um comando a fim de persistir ou remover dados do banco
+    // O trecho de código serve ao fim de envelopar o dado 
+    // do formulário, a ser enviado como um comando para
+    // a API de persistência de dados da Ycodify
     let command = {
         artist: {}
     };
-    // o trecho de código a seguir serve apenas para evitar
-    // uma listagem grande de "ifs e elses", a fim de checar os
+    // O trecho de código a seguir serve recuperar dados do 
+    // formulário para e para evitar uma listagem grande
+    // de "ifs e elses", a fim de checar os
     // valores para cada um dos inputs
     var form = document.getElementById("artist");
     for (var i = 0; i < form.elements.length; i++) {
@@ -78,13 +80,15 @@ function getCommand() {
 }
 
 function getQuery() {
-    // o trecho de código a seguir informa a estrutura básica 
-    // da consulta a ser enviada
+    // O trecho de código serve ao fim de envelopar o dado 
+    // do formulário, a ser enviado como uma consulta para
+    // a API de persistência de dados da Ycodify
     let query = {
         artist: {}
     };
-    // o trecho de código a seguir serve apenas para evitar
-    // uma listagem grande de "ifs e elses", a fim de checar os
+    // O trecho de código a seguir serve recuperar dados do 
+    // formulário para e para evitar uma listagem grande
+    // de "ifs e elses", a fim de checar os
     // valores para cada um dos inputs
     var form = document.getElementById("artist");
     for (var i = 0; i < form.elements.length; i++) {
@@ -167,7 +171,7 @@ const YCAPI = {
         },
         baseAddress:'https://api.ycodify.com'
     },
-    create: function (command, callback) {
+    create: function (data, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', YCAPI.param.baseAddress+'/v2/persistence/c/s/no-ac', true);
         xhr.setRequestHeader("Content-Type", 'application/json');
@@ -181,9 +185,13 @@ const YCAPI = {
                 });
             }
         };
+        // O objeto de dados posto na variável 'data' precisa 
+        // ser posto sob a chave 'data' no JSON a seguir. Só 
+        // então o command deve ser enviado à API de serviços 
+        // da Ycodify
         xhr.send(JSON.stringify({
             'action': 'CREATE',
-            'data': [command]
+            'data': [data]
         }));
     },
     read: function (query, callback) {
@@ -200,6 +208,10 @@ const YCAPI = {
                 });
             }
         };
+        // A consulta propriamente, posta na variável query, 
+        // precisa ser posta como um elemento de um vetor e 
+        // só então deve ser enviada à API de serviços da 
+        // Ycodify
         xhr.send(JSON.stringify([query]));
     },
     update: function (command, callback) {
@@ -216,6 +228,10 @@ const YCAPI = {
                 });
             }
         };
+        // O objeto de dados posto na variável 'data' precisa 
+        // ser posto sob a chave 'data' no JSON a seguir. Só 
+        // então o command deve ser enviado à API de serviços 
+        // da Ycodify
         xhr.send(JSON.stringify({
             'action': 'UPDATE',
             'data': [command]
@@ -235,6 +251,10 @@ const YCAPI = {
                 });
             }
         };
+        // O objeto de dados posto na variável 'data' precisa 
+        // ser posto sob a chave 'data' no JSON a seguir. Só 
+        // então o command deve ser enviado à API de serviços 
+        // da Ycodify
         xhr.send(JSON.stringify({
             'action': 'DELETE',
             'data': [command]
