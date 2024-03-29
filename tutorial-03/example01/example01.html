@@ -1,0 +1,72 @@
+<html>
+<head>
+<script src="./example01.js"></script>
+</head>
+<body>
+<br>
+<h2>Tutorial 01/Example 01 <small style="font-size: 14px;">Usando Javascript puro</small></h2>
+<p>
+    O código javascript escrito nesse html tem por objetivo auxiliar a compreensão do uso da API de Ycodify. Nele, usamos javascript puro com XMLHttpRequest como lib para requisições HTTP para a API.
+</p>
+<p>
+    Funcionalmente, o que segue é a codificação da operação de login, que envolve o seguinte dado a ser enviado ao serviço de autenticação (https://api.ycodify.com/v2/auth/signin):
+    <pre>
+        {
+            username: "username"
+            password: "password"
+        }
+    </pre>
+</p>
+<hr>
+<br>
+<br>
+<h3>Formulário para Login</h3>
+<br>
+<form id="acount">
+    <input id="username" placeholder="username da aplicação">
+    <input id="password" placeholder="password">
+</form>
+<br>
+<br>
+<button id="authenticate">autenticar</button>
+<hr>
+<br>
+<br>
+<h3>Listagem de Dados Relacionados à entidade Artist</h3>
+<br>
+<pre id="data">
+</pre>
+<script>
+function getCredentials() {
+    // O trecho de código serve ao fim de envelopar o dado 
+    // do formulário, a ser enviado como um comando para
+    // a API de persistência de dados da Ycodify
+    return {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    };
+    // O trecho de código a seguir serve recuperar dados do 
+    // formulário para e para evitar uma listagem grande
+    // de "ifs e elses", a fim de checar os
+    // valores para cada um dos inputs
+    
+}
+
+document.getElementById("authenticate").addEventListener("click", function () {
+    YCAPI.auth.run(getCredentials(), function(response) {
+        if (response.status == 200) {
+            // IMPORTANTE: o status 201 é o código para operação
+            // de criação de novo registro no banco de dados
+            // realizada com sucesso
+            console.log(JSON.parse(response.content));
+            document.getElementById("data").innerHTML = JSON.stringify(JSON.parse(response.content), undefined, 4);
+        } else {
+            alert('login ocorreu erro! veja o console ...');
+            console.log('error: ', response);
+        }
+    });
+});
+
+</script>
+</body>
+</html>
