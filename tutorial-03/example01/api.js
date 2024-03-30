@@ -257,7 +257,7 @@ const YCAPI = {
             let xhr = new XMLHttpRequest();
             xhr.open('POST', YCAPI.account.param.baseAddress.concat('/role'), true);
             xhr.setRequestHeader("Content-Type", 'application/json');
-            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     callback({
@@ -296,7 +296,7 @@ const YCAPI = {
             byNameAndOrganization: function (name, organizationUuid, callback) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', YCAPI.account.param.baseAddress.concat('/role/by/name/').concat(name).concat('/organization-uuid/').concat(organizationUuid), true);
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         callback({
@@ -333,7 +333,7 @@ const YCAPI = {
             byOrganization: function (organizationUuid, callback) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', YCAPI.account.param.baseAddress.concat('/role/by/organization-uuid/').concat(organizationUuid), true);
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         callback({
@@ -344,7 +344,22 @@ const YCAPI = {
                 };
                 xhr.send(null);
             }
-        }
+        },
+        associate: function (accountRole, callback) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', YCAPI.account.param.baseAddress.concat('/account-role/using/authority'), true);
+            xhr.setRequestHeader("Content-Type", 'application/json');
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
+                }
+            };
+            xhr.send(JSON.stringify(accountRole));
+        },
     },
     filer: {
         param: {

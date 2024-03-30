@@ -37,7 +37,7 @@
 <br>
 <br>
 <br>
-<h3>Formulário para criação de um novo papel de usuário</h3>
+<h3>Formulário para associacao entre conta de usuario e papel de usuário</h3>
 <br>
 <form id="role">
     <input id="username" placeholder="username de aplicação">
@@ -67,14 +67,14 @@ function getAccountRoleForm() {
     };
 }
 
-document.getElementById("criar").addEventListener("click", function () {
-    if (YCAPI.param.app.account.jwt) {
-        YCAPI.role.create(getAccountRoleForm(), function (response) {
+document.getElementById("associar").addEventListener("click", function () {
+    if (YCAPI.param.account.jwt) {
+        YCAPI.role.associate(getAccountRoleForm(), function (response) {
             if (response.status == 200) {
                 // IMPORTANTE: o status 200 é o código para operação
                 // de criação de associacao entre papel de usuário
                 // e conta de usuario no banco de dados -- realizada com sucesso
-                alert('Papel criado com sucesso!');
+                alert('Associação criada com sucesso!');
             } else {
                 alert('Falha ao criar o papel! Veja o console ...');
                 console.log('error: ', response);

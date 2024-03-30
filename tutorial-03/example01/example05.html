@@ -23,9 +23,9 @@
 <br>
 <h3>Formulário para Login</h3>
 <br>
-<form id="account">
-    <input id="username" placeholder="username da aplicação">
-    <input id="password" placeholder="password">
+<form id="console-account">
+    <input id="console-username" placeholder="username de console">
+    <input id="console-password" placeholder="password">
 </form>
 <br>
 <br>
@@ -38,7 +38,7 @@
 <form id="role">
     <input id="name" placeholder="Nome de papel de usuário">
     <input id="owner" placeholder="Organização (UUID) proprietária do papel">
-    <input id="status" placeholder="Situação do papel">
+    <input id="status" placeholder="Situação do papel" value="ACTIVE">
 </form>
 <br>
 <br>
@@ -59,7 +59,7 @@ function getRoleForm() {
 }
 
 document.getElementById("criar").addEventListener("click", function () {
-    if (YCAPI.param.app.account.jwt) {
+    if (YCAPI.param.account.jwt) {
         YCAPI.role.create(getRoleForm(), function (response) {
             if (response.status == 201) {
                 // IMPORTANTE: o status 201 é o código para operação
@@ -88,19 +88,19 @@ function getAccountForm() {
     // do formulário, a ser enviado a API de autenticação de 
     // usuários (auth) da Ycodify
     return {
-        username: document.getElementById("username").value,
-        password: document.getElementById("password").value
+        username: document.getElementById("console-username").value,
+        password: document.getElementById("console-password").value
     };
 }
 
 document.getElementById("autenticar").addEventListener("click", function () {
-    YCAPI.auth.app.match(getAccountForm(), function(response) {
+    YCAPI.auth.match(getAccountForm(), function(response) {
         if (response.status == 200) {
             // IMPORTANTE: o status 200 é o código para operação
             // de match de credencial realizada com sucesso
             console.log(JSON.parse(response.content));
             alert('Login realizado com sucesso!');
-            YCAPI.param.app.account.jwt = JSON.parse(response.content).accessToken;
+            YCAPI.param.account.jwt = JSON.parse(response.content).accessToken;
         } else {
             alert('Falha ao tentar o login! Veja o console ...');
             console.log('error: ', response);
