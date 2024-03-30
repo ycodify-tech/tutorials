@@ -1,0 +1,112 @@
+<html>
+<head>
+<script src="./api.js"></script>
+</head>
+<body>
+<br>
+<h2>Tutorial 03/Example 02 <small style="font-size: 14px;">Usando Javascript puro</small></h2>
+<p>
+    O código javascript escrito nesse html tem por objetivo auxiliar a compreensão do uso da API de Ycodify. Nele, usamos javascript puro com XMLHttpRequest como lib para requisições HTTP para a API.
+</p>
+<p>
+    Funcionalmente, o que segue é a codificação da operação de criação de papel de usuário (https://api.ycodify.com/v2/id/role):
+    <pre>
+        {
+            name: "name",
+            owner: "owner",
+            status: "status"
+        }
+    </pre>
+    Todos os atributos são obrigatórios
+</p>
+<hr>
+<br>
+<h3>Formulário para Login</h3>
+<br>
+<form id="account">
+    <input id="username" placeholder="username da aplicação">
+    <input id="password" placeholder="password">
+</form>
+<br>
+<br>
+<button id="autenticar">autenticar</button>
+<br>
+<br>
+<br>
+<h3>Formulário para criação de um novo papel de usuário</h3>
+<br>
+<form id="role">
+    <input id="name" placeholder="Nome de papel de usuário">
+    <input id="owner" placeholder="Organização (UUID) proprietária do papel">
+    <input id="status" placeholder="Situação do papel">
+</form>
+<br>
+<br>
+<button id="criar">Criar nova conta</button>
+<br>
+<script>
+YCAPI.param.app.account.jwt = null;
+
+function getRoleForm() {
+    // O trecho de código serve ao fim de envelopar o dado 
+    // do formulário, a ser enviado a API de gerencia de 
+    // (id) da Ycodify
+    return {
+        name: document.getElementById("name").value,
+        owner: document.getElementById("owner").value,
+        status: document.getElementById("status").value
+    };
+}
+
+document.getElementById("criar").addEventListener("click", function () {
+    if (YCAPI.param.app.account.jwt) {
+        YCAPI.role.create(getRoleForm(), function (response) {
+            if (response.status == 201) {
+                // IMPORTANTE: o status 201 é o código para operação
+                // de criação de novo registro de papel de usuário
+                // no banco de dados -- realizada com sucesso
+                alert('Papel criado com sucesso!');
+            } else {
+                alert('Falha ao criar o papel! Veja o console ...');
+                console.log('error: ', response);
+            }
+        });
+    } else alert('É preciso realizar o login primeiro ...');
+});
+
+
+
+/**
+ * *****************************************************************************
+ * a sequencia de código a seguir realiza o login da conta, 
+ * necessário para que a operação de criação de papel de
+ * usuário possa ser realizada.
+ * 
+ */
+function getAccountForm() {
+    // O trecho de código serve ao fim de envelopar o dado 
+    // do formulário, a ser enviado a API de autenticação de 
+    // usuários (auth) da Ycodify
+    return {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    };
+}
+
+document.getElementById("autenticar").addEventListener("click", function () {
+    YCAPI.auth.app.match(getAccountForm(), function(response) {
+        if (response.status == 200) {
+            // IMPORTANTE: o status 200 é o código para operação
+            // de match de credencial realizada com sucesso
+            console.log(JSON.parse(response.content));
+            alert('Login realizado com sucesso!');
+            YCAPI.param.app.account.jwt = JSON.parse(response.content).accessToken;
+        } else {
+            alert('Falha ao tentar o login! Veja o console ...');
+            console.log('error: ', response);
+        }
+    });
+});
+</script>
+</body>
+</html>

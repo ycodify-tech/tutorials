@@ -15,6 +15,11 @@ const YCAPI = {
         },
         account: {
             jwt: ''
+        },
+        app: {
+            account: {
+                jwt
+            }
         }
     },
     persistence: {
@@ -165,7 +170,6 @@ const YCAPI = {
         get: {
             /**
              * 
-             * @param {*} jwt: the account JSON Web Token 
              * @param {*} callback: a function to be invoked to return 
              *     the application's normal flow of execution.
              * 
@@ -188,11 +192,148 @@ const YCAPI = {
              *     *, request help.
              * 
              */
-            byJWT: function (jwt, callback) {
+            byJWT: function (callback) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', YCAPI.account.param.baseAddress.concat('/account/by/jwt'), true);
                 xhr.setRequestHeader("Content-Type", 'application/json');
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(jwt));
+                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        callback({
+                            status: xhr.status,
+                            content: xhr.response
+                        });
+                    }
+                };
+                xhr.send(null);
+            },
+            byUsername: function (username, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', YCAPI.account.param.baseAddress.concat('/open/account/by/username/').concat(username).concat('/exists'), true);
+                xhr.setRequestHeader("Content-Type", 'application/json');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        callback({
+                            status: xhr.status,
+                            content: xhr.response
+                        });
+                    }
+                };
+                xhr.send(null);
+            }
+        }
+    },
+    role: {
+        param: {
+            baseAddress: baseAddress.concat('/v2/id')
+        },
+        /**
+         * 
+         * @param {*} role: as per specification: 
+         *  {
+         *    "name": "",
+         *    "owner": "",
+         *    "status": "[ACTIVE|SUSPENDED|CANCELED]"
+         *  }; 
+         * @param {*} callback: a function to be invoked to return 
+         *     the application's normal flow of execution 
+         * 
+         *  the function returns as:
+         *  {
+         *    "status": "", //The HTTP Status Code from backend,
+         *    "content": {
+         *      "name": "",
+         *      "owner": "",
+         *      "status": ""
+         *    }
+         *  }
+         * 
+         * if HTTP Status Code is 
+         *   201, an role was found.
+         *     *, request help.
+         * 
+         */
+        create: function (account, callback) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', YCAPI.account.param.baseAddress.concat('/role'), true);
+            xhr.setRequestHeader("Content-Type", 'application/json');
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
+                }
+            };
+            xhr.send(JSON.stringify(account));
+        },
+        get: {
+            /**
+             * 
+             * @param {*} name: the role's name
+             * @param {*} organizationUuid: the organizationUuid from the project organization 
+             * @param {*} callback: a function to be invoked to return 
+             *     the application's normal flow of execution.
+             * 
+             *  the function returns as:
+             *  {
+             *    "status": "", //The HTTP Status Code from backend,
+             *    "content": {
+             *      "id": "",
+             *      "name": "",
+             *      "owner": "",
+             *      "status": ""
+             *    }
+             *  }
+             * 
+             * if HTTP Status Code is 
+             *   200, an role was found.
+             *   204, the role does not exist.
+             *     *, request help.
+             * 
+             */
+            byNameAndOrganization: function (name, organizationUuid, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', YCAPI.account.param.baseAddress.concat('/role/by/name/').concat(name).concat('/organization-uuid/').concat(organizationUuid), true);
+                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        callback({
+                            status: xhr.status,
+                            content: xhr.response
+                        });
+                    }
+                };
+                xhr.send(null);
+            },
+            /**
+             * 
+             * @param {*} organizationUuid: the organizationUuid from the project organization 
+             * @param {*} callback: a function to be invoked to return 
+             *     the application's normal flow of execution.
+             * 
+             *  the function returns as:
+             *  {
+             *    "status": "", //The HTTP Status Code from backend,
+             *    "content": [{
+             *      "id": "",
+             *      "name": "",
+             *      "owner": "",
+             *      "status": ""
+             *    }]
+             *  }
+             * 
+             * if HTTP Status Code is 
+             *   200, roles was found.
+             *   204, roles does not exist.
+             *     *, request help.
+             * 
+             */
+            byOrganization: function (organizationUuid, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', YCAPI.account.param.baseAddress.concat('/role/by/organization-uuid/').concat(organizationUuid), true);
+                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         callback({
@@ -209,100 +350,90 @@ const YCAPI = {
         param: {
             baseAddress: baseAddress.concat('/v2/filer')
         },
-        upload: {
-            invoke: function (fileName, body, callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName), true);
-                xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
-                // choose either X-API-Master-Key header or Authorization header.
-                /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        callback({
-                            status: xhr.status,
-                            content: xhr.response
-                        });
-                    }
-                };
-                xhr.send(body);
-            }
-        },
-        list: {
-            invoke: function (callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', YCAPI.filer.param.baseAddress.concat('/storage/object'), true);
-                xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
-                // choose either X-API-Master-Key header or Authorization header.
-                /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        callback({
-                            status: xhr.status,
-                            content: xhr.response
-                        });
-                    }
-                };
-                xhr.send(null);
-            }
-        },
-        exist: {
-            invoke: function (fileName, callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName).concat('/exist'), true);
-                xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
-                // choose either X-API-Master-Key header or Authorization header.
-                /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        callback({
-                            status: xhr.status,
-                            content: xhr.response
-                        });
-                    }
-                };
-                xhr.send(null);
-            }
-        },
-        get: {
-            invoke: function (fileName, callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName), true);
-                xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
-                // choose either X-API-Master-Key header or Authorization header.
-                /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        callback({
-                            status: xhr.status,
-                            content: xhr.response
-                        });
-                    }
-                };
-                xhr.send(null);
-                document.getElementById('global-spinner').hidden = false;
-            }
-        },
-        delete: {
-            invoke: function (tenantId, accessToken, fileName, callback, meta) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('DELETE', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName), true);
-                xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
-                // choose either X-API-Master-Key header or Authorization header.
-                /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
-                xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.account.jwt));
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        callback({
-                            status: xhr.status,
-                            content: xhr.response
-                        });
-                    }
-                    xhr.send(null);
+        upload: function (fileName, body, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName), true);
+            xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+            // choose either X-API-Master-Key header or Authorization header.
+            /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
                 }
+            };
+            xhr.send(body);
+        },
+        list: function (callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', YCAPI.filer.param.baseAddress.concat('/storage/object'), true);
+            xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+            // choose either X-API-Master-Key header or Authorization header.
+            /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
+                }
+            };
+            xhr.send(null);
+        },
+        exist: function (fileName, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName).concat('/exist'), true);
+            xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+            // choose either X-API-Master-Key header or Authorization header.
+            /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
+                }
+            };
+            xhr.send(null);
+        },
+        get: function (fileName, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName), true);
+            xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+            // choose either X-API-Master-Key header or Authorization header.
+            /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
+                }
+            };
+            xhr.send(null);
+            document.getElementById('global-spinner').hidden = false;
+        },
+        delete: function (fileName, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', YCAPI.filer.param.baseAddress.concat('/storage/object/name/').concat(fileName), true);
+            xhr.setRequestHeader("X-Tenant-Id", YCAPI.param.tenant.id);
+            // choose either X-API-Master-Key header or Authorization header.
+            /* xhr.setRequestHeader("X-API-Master-Key", YCAPI.param.tenant.apiMasterKey); */
+            xhr.setRequestHeader("Authorization", 'Bearer '.concat(YCAPI.param.app.account.jwt));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    callback({
+                        status: xhr.status,
+                        content: xhr.response
+                    });
+                }
+                xhr.send(null);
             }
         }
     },
@@ -334,9 +465,9 @@ const YCAPI = {
          *     *, request help.
          * 
          */
-        run: function (credentials, callback) {
+        match: function (credentials, callback) {
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', YCAPI.auth.param.baseAddress.concat('/signin'), true);
+            xhr.open('POST', YCAPI.auth.param.baseAddress.concat('/internal/signin'), true);
             xhr.setRequestHeader("Content-Type", 'application/json');
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -347,6 +478,22 @@ const YCAPI = {
                 }
             };
             xhr.send(JSON.stringify(credentials));
+        },
+        app: {
+            match: function(credentials, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', YCAPI.auth.param.baseAddress.concat('/signin'), true);
+                xhr.setRequestHeader("Content-Type", 'application/json');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        callback({
+                            status: xhr.status,
+                            content: xhr.response
+                        });
+                    }
+                };
+                xhr.send(JSON.stringify(credentials));
+            }
         }
     }
 }

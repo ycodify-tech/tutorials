@@ -1,0 +1,48 @@
+<html>
+<head>
+<script src="./api.js"></script>
+</head>
+<body>
+<br>
+<h2>Tutorial 03/Example 03 <small style="font-size: 14px;">Usando Javascript puro</small></h2>
+<p>
+    O código javascript escrito nesse html tem por objetivo auxiliar a compreensão do uso da API de Ycodify. Nele, usamos javascript puro com XMLHttpRequest como lib para requisições HTTP para a API.
+</p>
+<p>
+    Funcionalmente, o que segue é a codificação da operação de consulta à existência de conta de usuário (https://api.ycodify.com/v2/id/open/account/by/username/{username}/exists).
+</p>
+<hr>
+<br>
+<br>
+<h3>Formulário para consulta a existência de conta de usuário</h3>
+<br>
+<form id="account">
+    <input id="username" placeholder="username da aplicação">
+</form>
+<br>
+<br>
+<button id="consultar">Consultar</button>
+<br>
+<script>
+document.getElementById("consultar").addEventListener("click", function () {
+    let username = document.getElementById("username").value;
+    YCAPI.account.get.byUsername(username, function(response) {
+        if (response.status == 200) {
+            // IMPORTANTE: o status 200 é o código para operação
+            // de consulta a existência de conta de usuário
+            // que informa sua existencia
+            alert('Conta existente!');
+        } else if (response.status == 204) {
+            // IMPORTANTE: o status 204 é o código para operação
+            // de consulta a existência de conta de usuário
+            // que informa sua inexistencia
+            alert('Conta inexistente!');
+        } else {
+            alert('Falha ao criar a conta! Veja o console ...');
+            console.log('error: ', response);
+        }
+    });
+});
+</script>
+</body>
+</html>

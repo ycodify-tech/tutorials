@@ -1,0 +1,65 @@
+<html>
+<head>
+<script src="./api.js"></script>
+</head>
+<body>
+<br>
+<h2>Tutorial 03/Example 02 <small style="font-size: 14px;">Usando Javascript puro</small></h2>
+<p>
+    O código javascript escrito nesse html tem por objetivo auxiliar a compreensão do uso da API de Ycodify. Nele, usamos javascript puro com XMLHttpRequest como lib para requisições HTTP para a API.
+</p>
+<p>
+    Funcionalmente, o que segue é a codificação da operação de criação de conta de usuário (https://api.ycodify.com/v2/id/open/account):
+    <pre>
+        {
+            username: "username",
+            password: "password",
+            name: "name",
+            email: "email"
+        }
+    </pre>
+    Os atributos <strong>username</strong>, <strong>password</strong> e <strong>email</strong> são obrigatórios.
+    <strong>IMPORTANTE:</strong> para que o usuário possa fazer o login, É OBRIGATÓRIO associá-lo a um papel de usuário (Role). Ou seja, após criar o usuário, é preciso associá-lo a um papel de usuário que esteja defiido no sistema. A fim de fazer isso, acesse a página de exemplo 05.
+</p>
+<hr>
+<br>
+<br>
+<h3>Formulário para criação de uma nova conta de usuário</h3>
+<br>
+<form id="account">
+    <input id="username" placeholder="username da aplicação">
+    <input id="password" placeholder="password">    
+    <input id="email" placeholder="e-mail">
+</form>
+<br>
+<br>
+<button id="criar">Criar nova conta</button>
+<br>
+<script>
+function getForm() {
+    // O trecho de código serve ao fim de envelopar o dado 
+    // do formulário, a ser enviado a API de gerencia de 
+    // (id) da Ycodify
+    return {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+        email: document.getElementById("email").value
+    };
+}
+
+document.getElementById("criar").addEventListener("click", function () {
+    YCAPI.account.create(getForm(), function(response) {
+        if (response.status == 201) {
+            // IMPORTANTE: o status 201 é o código para operação
+            // de criação de novo registro de conta de usuários
+            // no banco de dados -- realizada com sucesso
+            alert('Conta criada com sucesso!');
+        } else {
+            alert('Falha ao criar a conta! Veja o console ...');
+            console.log('error: ', response);
+        }
+    });
+});
+</script>
+</body>
+</html>
